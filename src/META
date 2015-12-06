@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: c6caa98ca737ed4b15776c695dc26046)
+version = "0.1"
+description = "Bindings to zlib, a deflate compression library"
+requires = "bigarray"
+archive(byte) = "zlib.cma"
+archive(byte, plugin) = "zlib.cma"
+archive(native) = "zlib.cmxa"
+archive(native, plugin) = "zlib.cmxs"
+exists_if = "zlib.cma"
+# OASIS_STOP
+

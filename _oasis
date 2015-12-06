@@ -1,0 +1,52 @@
+OASISFormat:	0.4
+
+Name:		zlib
+Version:	0.1
+Synopsis:	Bindings to zlib, a deflate compression library
+Authors:	Christopher Zimmermann <christopher@gmerlin.de>
+License:	ISC
+
+Description:	zlib provides deflate compression, optionally wrapped in gzip or zlib format.
+Homepage:	http://zlib.net
+
+BuildTools:	ocamlbuild
+Plugins:	META (0.4)
+AlphaFeatures:	ocamlbuild_more_args
+
+
+SourceRepository master
+  Type: git
+  Location: https://github.com/madroach/ocaml-zlib.git
+  Branch: master
+  Browser: https://github.com/madroach/ocaml-zlib
+
+Library "zlib"
+  Path:			src
+  Modules:		Zlib
+  BuildDepends:		bigarray
+  XMETARequires:	bigarray
+  CSources:		zlib_stubs.c
+  CCLib:		-lz
+  CCOpt:		-Wall -Wextra -Wno-unused-parameter -pedantic -std=c99
+
+Document "zlib_api"
+  Type: ocamlbuild (0.4)
+  BuildTools: ocamldoc
+
+  Title: API reference for Zlib
+  XOCamlbuildPath: doc
+  XOCamlbuildExtraArgs:
+    "-docflags '-colorize-code -short-functors -charset utf-8'"
+  XOCamlbuildLibraries: zlib
+
+Executable "test"
+  Path:			test
+  MainIs:		test.ml
+  BuildDepends:		unix, zlib
+  CompiledObject:	byte
+  Install:		false
+
+Test zlib
+  TestTools:		test
+  WorkingDirectory:	.
+  Command:		LD_LIBRARY_PATH=_build $test zlib_stubs.c

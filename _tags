@@ -1,0 +1,36 @@
+# OASIS_START
+# DO NOT EDIT (digest: 394fb8a8d55c3804ce1e617a4013792d)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+true: annot, bin_annot
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library zlib
+"src/zlib.cmxs": use_zlib
+<src/*.ml{,i,y}>: oasis_library_zlib_ccopt
+"src/zlib_stubs.c": oasis_library_zlib_ccopt
+<src/zlib.{cma,cmxa}>: oasis_library_zlib_cclib
+"src/libzlib_stubs.lib": oasis_library_zlib_cclib
+"src/dllzlib_stubs.dll": oasis_library_zlib_cclib
+"src/libzlib_stubs.a": oasis_library_zlib_cclib
+"src/dllzlib_stubs.so": oasis_library_zlib_cclib
+<src/zlib.{cma,cmxa}>: use_libzlib_stubs
+<src/*.ml{,i,y}>: pkg_bigarray
+"src/zlib_stubs.c": pkg_bigarray
+# Executable test
+"test/test.byte": pkg_bigarray
+"test/test.byte": pkg_unix
+"test/test.byte": use_zlib
+<test/*.ml{,i,y}>: pkg_bigarray
+<test/*.ml{,i,y}>: pkg_unix
+<test/*.ml{,i,y}>: use_zlib
+# OASIS_STOP
