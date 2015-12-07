@@ -44,9 +44,10 @@ Executable "test"
   MainIs:		test.ml
   BuildDepends:		unix, zlib
   CompiledObject:	byte
+  Custom:		true
   Install:		false
 
 Test zlib
   TestTools:		test
   WorkingDirectory:	.
-  Command:		LD_LIBRARY_PATH=_build $test zlib_stubs.c
+  Command:		$test zlib_stubs.c
