@@ -26,7 +26,7 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
   end;
   let bound = deflate_bound deflate.state (Array1.dim buf) in
   deflate.in_ba <- buf;
-  deflate.out_ba <- Array1.create Char C_layout (bound + 768);
+  deflate.out_ba <- Array1.create char c_layout (bound + 768);
   begin match flate deflate Finish with
     | Stream_end -> ()
     | Ok -> failwith "Ok"
@@ -40,7 +40,7 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
         Binary -> "binary" |Text -> "text" |Unknown -> "unknown"
     end;
   inflate.in_ba <- deflate.out_ba;
-  inflate.out_ba <- Array1.create Char C_layout (Array1.dim buf);
+  inflate.out_ba <- Array1.create char c_layout (Array1.dim buf);
   inflate.in_len <- 10;
   inflate.out_len <- 10;
   let rec loop () =
@@ -105,9 +105,9 @@ let () =
     ; name    = Some ("This is the filename" ^ String.make 576 '#')
     ; comment = Some "This is the comment"
     } in
-  let text = Array1.map_file fd Char C_layout false ~-1 in
-  let binary = Array1.create Char C_layout 500_000 in
-  let ascii = Array1.create Char C_layout 500_000 in
+  let text = Array1.map_file fd char c_layout false ~-1 in
+  let binary = Array1.create char c_layout 500_000 in
+  let ascii = Array1.create char c_layout 500_000 in
   Random.self_init ();
   for i = 0 to Array1.dim binary - 1 do
     Array1.set binary i (char_of_int (Random.int 256))
