@@ -1,13 +1,13 @@
 OASISFormat:	0.4
 
 Name:		zlib
-Version:	0.1
+Version:	0.4
 Synopsis:	Bindings to zlib, a deflate compression library
 Authors:	Christopher Zimmermann <christopher@gmerlin.de>
 License:	ISC
 
 Description:	zlib provides deflate compression, optionally wrapped in gzip or zlib format.
-Homepage:	http://zlib.net
+Homepage:	https://github.com/madroach/ocaml-zlib
 
 BuildTools:	ocamlbuild
 Plugins:	META (0.4)
@@ -34,7 +34,7 @@ Document "zlib_api"
   BuildTools: ocamldoc
 
   Title: API reference for Zlib
-  XOCamlbuildPath: doc
+  XOCamlbuildPath: .
   XOCamlbuildExtraArgs:
     "-docflags '-colorize-code -short-functors -charset utf-8'"
   XOCamlbuildLibraries: zlib
