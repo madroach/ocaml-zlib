@@ -92,6 +92,20 @@ struct wrap_strm {
 #define WRAP_STRM_WOSIZE \
   ((sizeof(struct wrap_strm) + sizeof(value) - 1) / sizeof(value))
 
+static struct wrap_header* init_header()
+{
+  struct wrap_header *h = caml_stat_alloc(sizeof(struct wrap_header));
+  h->zheader.extra = h->extra;
+  h->zheader.name = h->name;
+  h->zheader.comment = h->comment;
+  h->zheader.extra_max = sizeof(h->extra);
+  h->zheader.name_max = sizeof(h->name);
+  h->zheader.comm_max = sizeof(h->comment);
+  h->zheader.hcrc = 0;
+  h->zheader.done = 0;
+  return h;
+}
+
 void zlib_finalize(value vwrap)
 {
   struct wrap_strm *wrap = Data_custom_val(vwrap);
@@ -169,17 +183,8 @@ CAMLprim value zlib_inflate_init(value windowBits)
 
   /* prepare gz header struct for gz and automatic header detect mode */
   if (wBits > 15) {
-    header = caml_stat_alloc(sizeof(struct wrap_header));
+    header = init_header();
     memory += sizeof(struct wrap_header);
-
-    header->zheader.extra	= header->extra;
-    header->zheader.name	= header->name;
-    header->zheader.comment	= header->comment;
-    header->zheader.extra_max	= sizeof(header->extra);
-    header->zheader.name_max 	= sizeof(header->name);
-    header->zheader.comm_max 	= sizeof(header->comment);
-    header->zheader.hcrc	= 0;
-    header->zheader.done	= 0;
   }
 
   memory += abs(wBits) & 15 ? 1 << (abs(wBits) & 15) : 1 << 15;
@@ -280,7 +285,7 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
   assert((wrap->flags & ZLIB_INFLATE) == 0);
 
   if (wrap->header == NULL)
-    wrap->header = caml_stat_alloc(sizeof(gz_header));
+    wrap->header = init_header();
   header = &wrap->header->zheader;
 
   memset(header, 0, sizeof(gz_header));
@@ -294,8 +299,7 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
     /* this string is _not_ expected to be zero-terminated */
     len = caml_string_length(Field(Field(vheader,4),0));
     header->extra_len = len;
-    header->extra = caml_stat_alloc(len);
-    memcpy(header->extra, String_val(Field(Field(vheader,4),0)), len);
+    memcpy(wrap->header->extra, String_val(Field(Field(vheader,4),0)), len);
   }
   else
     assert(Int_val(Field(vheader,4)) == 0);
@@ -304,8 +308,7 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
   if (Is_block(Field(vheader,5))) {
     assert(Tag_val(Field(vheader,5)) == 0);
     len = caml_string_length(Field(Field(vheader,5),0)) + 1;
-    header->name = caml_stat_alloc(len);
-    memcpy(header->name, String_val(Field(Field(vheader,5),0)), len);
+    memcpy(wrap->header->name, String_val(Field(Field(vheader,5),0)), len);
   }
   else
     assert(Int_val(Field(vheader,5)) == 0);
@@ -316,8 +319,7 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
     /* this string is expected to be zero-terminated
      * add 1 to length to copy the zero byte from ocaml string */
     len = caml_string_length(Field(Field(vheader,6),0)) + 1;
-    header->comment = caml_stat_alloc(len);
-    memcpy(header->comment, String_val(Field(Field(vheader,6),0)), len);
+    memcpy(wrap->header->comment, String_val(Field(Field(vheader,6),0)), len);
   }
   else
     assert(Int_val(Field(vheader,6)) == 0);
