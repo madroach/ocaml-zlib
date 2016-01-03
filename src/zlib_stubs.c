@@ -74,13 +74,17 @@ value zlib_error(z_streamp zstrm, int error)
   assert(0);
 }
 
+#define EXTRA_MAX 4096
+#define NAME_MAX 512
+#define COMMENT_MAX 4096
+
 /* structure containing the zlib gz_header together with the required buffers.
  * This simplifies allocation / freeing. */
 struct wrap_header {
     gz_header zheader;
-    Bytef extra[4096];
-    Bytef name[512];
-    Bytef comment[4096];
+    Bytef extra[EXTRA_MAX];
+    Bytef name[NAME_MAX];
+    Bytef comment[COMMENT_MAX];
 };
 
 struct wrap_strm {
@@ -275,6 +279,36 @@ CAMLprim value zlib_inflate_set_dictionary(value vstrm, value vdict)
 	  caml_string_length(vdict)));
 }
 
+// Validating the header structure received by Zlib.set_header
+static void validate_vheader(value vheader)
+{
+  /* Checking the "extra" string */
+  if (Is_block(Field(vheader,4))) {
+    assert(Tag_val(Field(vheader,4)) == 0);
+    /* this string is _not_ expected to be zero-terminated */
+    if (caml_string_length(Field(Field(vheader,4),0)) > EXTRA_MAX)
+      caml_invalid_argument("Zlib.set_header: \"extra\" string is too long");
+  }
+
+  /* Checking the "name" string */
+  if (Is_block(Field(vheader,5))) {
+    assert(Tag_val(Field(vheader,5)) == 0);
+    /* this string is expected to be zero-terminated
+     * add 1 to length to copy the zero byte from ocaml string */
+    if (caml_string_length(Field(Field(vheader,5),0)) + 1 > NAME_MAX)
+      caml_invalid_argument("Zlib.set_header: \"name\" string is too long");
+  }
+
+  /* Checking the "comment" string */
+  if (Is_block(Field(vheader,6))) {
+    assert(Tag_val(Field(vheader,6)) == 0);
+    /* this string is expected to be zero-terminated
+     * add 1 to length to copy the zero byte from ocaml string */
+    if (caml_string_length(Field(Field(vheader,6),0)) + 1 > COMMENT_MAX)
+      caml_invalid_argument("Zlib.set_header: \"comment\" string is too long");
+  }
+}
+
 CAMLprim value zlib_set_header(value vstrm, value vheader)
 {
   struct wrap_strm *wrap = Data_custom_val(vstrm);
@@ -283,6 +317,7 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
   size_t len;
 
   assert((wrap->flags & ZLIB_INFLATE) == 0);
+  validate_vheader(vheader);
 
   if (wrap->header == NULL)
     wrap->header = init_header();
@@ -301,17 +336,24 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
     header->extra_len = len;
     memcpy(wrap->header->extra, String_val(Field(Field(vheader,4),0)), len);
   }
-  else
+  else {
     assert(Int_val(Field(vheader,4)) == 0);
+    header->extra = NULL;
+    header->extra_len = 0;
+  }
 
   /* name */
   if (Is_block(Field(vheader,5))) {
     assert(Tag_val(Field(vheader,5)) == 0);
+    /* this string is expected to be zero-terminated
+     * add 1 to length to copy the zero byte from ocaml string */
     len = caml_string_length(Field(Field(vheader,5),0)) + 1;
     memcpy(wrap->header->name, String_val(Field(Field(vheader,5),0)), len);
   }
-  else
+  else {
     assert(Int_val(Field(vheader,5)) == 0);
+    header->name = NULL;
+  }
 
   /* comment */
   if (Is_block(Field(vheader,6))) {
@@ -321,8 +363,10 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
     len = caml_string_length(Field(Field(vheader,6),0)) + 1;
     memcpy(wrap->header->comment, String_val(Field(Field(vheader,6),0)), len);
   }
-  else
+  else {
     assert(Int_val(Field(vheader,6)) == 0);
+    header->comment = NULL;
+  }
 
   zlib_error(zstrm,
       deflateSetHeader(zstrm, header));
