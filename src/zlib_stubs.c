@@ -74,18 +74,9 @@ value zlib_error(z_streamp zstrm, int error)
   assert(0);
 }
 
-/* structure containing the zlib gz_header together with the required buffers.
- * This simplifies allocation / freeing. */
-struct wrap_header {
-    gz_header zheader;
-    Bytef extra[4096];
-    Bytef name[512];
-    Bytef comment[4096];
-};
-
 struct wrap_strm {
   z_streamp zstrm;
-  struct wrap_header *header;
+  gz_header *header;
   int flags;
 };
 #define ZLIB_INFLATE 1
@@ -163,23 +154,26 @@ CAMLprim value zlib_inflate_init(value windowBits)
   value vwrap;
   struct wrap_strm *wrap;
   z_streamp zstrm;
-  struct wrap_header *header = NULL;
+  gz_header *header = NULL;
   size_t memory = 0;
   const int wBits = Int_val(windowBits);
 
   /* prepare gz header struct for gz and automatic header detect mode */
   if (wBits > 15) {
-    header = caml_stat_alloc(sizeof(struct wrap_header));
-    memory += sizeof(struct wrap_header);
+    const size_t extral = 4096, namel = 512, commentl = 4096;
+    const size_t totall = sizeof(gz_header) + extral + namel + commentl;
 
-    header->zheader.extra	= header->extra;
-    header->zheader.name	= header->name;
-    header->zheader.comment	= header->comment;
-    header->zheader.extra_max	= sizeof(header->extra);
-    header->zheader.name_max 	= sizeof(header->name);
-    header->zheader.comm_max 	= sizeof(header->comment);
-    header->zheader.hcrc	= 0;
-    header->zheader.done	= 0;
+    header = caml_stat_alloc(totall);
+    memory += totall;
+
+    header->extra	= (Bytef *)header + sizeof(gz_header);
+    header->name	= header->extra + extral;
+    header->comment	= header->name + namel;
+    header->extra_max	= extral;
+    header->name_max 	= namel;
+    header->comm_max 	= commentl;
+    header->hcrc	= 0;
+    header->done	= 0;
   }
 
   memory += abs(wBits) & 15 ? 1 << (abs(wBits) & 15) : 1 << 15;
@@ -193,7 +187,7 @@ CAMLprim value zlib_inflate_init(value windowBits)
 
   zlib_error(zstrm, inflateInit2(zstrm, wBits));
   if (header != NULL)
-    zlib_error(zstrm, inflateGetHeader(zstrm, &header->zheader));
+    zlib_error(zstrm, inflateGetHeader(zstrm, header));
 
   return vwrap;
 }
@@ -274,28 +268,17 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
 {
   struct wrap_strm *wrap = Data_custom_val(vstrm);
   z_streamp zstrm = wrap->zstrm;
-  gz_headerp header;
-  size_t len;
+  gz_header *header;
+  Bytef *p;
+  size_t len = sizeof(gz_header);
 
   assert((wrap->flags & ZLIB_INFLATE) == 0);
-
-  if (wrap->header == NULL)
-    wrap->header = caml_stat_alloc(sizeof(gz_header));
-  header = &wrap->header->zheader;
-
-  memset(header, 0, sizeof(gz_header));
-  header->text =  Int_val(Field(vheader,0));
-  header->os   = Long_val(Field(vheader,2));
-  header->time = Double_val(Field(vheader,1));
 
   /* extra */
   if (Is_block(Field(vheader,4))) {
     assert(Tag_val(Field(vheader,4)) == 0);
-    /* this string is _not_ expected to be zero-terminated */
-    len = caml_string_length(Field(Field(vheader,4),0));
-    header->extra_len = len;
-    header->extra = caml_stat_alloc(len);
-    memcpy(header->extra, String_val(Field(Field(vheader,4),0)), len);
+    /* zlib does *not* expect this string to be zero-terminated */
+    len += caml_string_length(Field(Field(vheader,4),0));
   }
   else
     assert(Int_val(Field(vheader,4)) == 0);
@@ -303,9 +286,8 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
   /* name */
   if (Is_block(Field(vheader,5))) {
     assert(Tag_val(Field(vheader,5)) == 0);
-    len = caml_string_length(Field(Field(vheader,5),0)) + 1;
-    header->name = caml_stat_alloc(len);
-    memcpy(header->name, String_val(Field(Field(vheader,5),0)), len);
+    /* zlib *does* expect this string to be zero-terminated - add one. */
+    len += caml_string_length(Field(Field(vheader,5),0)) + 1;
   }
   else
     assert(Int_val(Field(vheader,5)) == 0);
@@ -313,14 +295,52 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
   /* comment */
   if (Is_block(Field(vheader,6))) {
     assert(Tag_val(Field(vheader,6)) == 0);
-    /* this string is expected to be zero-terminated
-     * add 1 to length to copy the zero byte from ocaml string */
-    len = caml_string_length(Field(Field(vheader,6),0)) + 1;
-    header->comment = caml_stat_alloc(len);
-    memcpy(header->comment, String_val(Field(Field(vheader,6),0)), len);
+    /* zlib *does* expect this string to be zero-terminated - add one. */
+    len += caml_string_length(Field(Field(vheader,6),0)) + 1;
   }
   else
     assert(Int_val(Field(vheader,6)) == 0);
+
+  if (wrap->header != NULL)
+    caml_stat_free(wrap->header);
+  wrap->header = header = caml_stat_alloc(len);
+
+  memset(header, 0, sizeof(gz_header));
+  header->text =    Int_val(Field(vheader,0));
+  /* XXX use int64 instead ? */
+  header->time = Double_val(Field(vheader,1));
+  header->os   =   Long_val(Field(vheader,2));
+  p = (Bytef *)header + sizeof(gz_header);
+
+  /* extra */
+  if (Is_block(Field(vheader,4))) {
+    /* zlib does *not* expect this string to be zero-terminated */
+    len = caml_string_length(Field(Field(vheader,4),0));
+    memcpy(p, String_val(Field(Field(vheader,4),0)), len);
+    header->extra_len = len;
+    header->extra = p;
+    p += len;
+  }
+
+  /* name */
+  if (Is_block(Field(vheader,5))) {
+    /* zlib *does* expect this string to be zero-terminated - add one.
+     * OCaml strings are zery-terminated, just copy the final '\0', too. */
+    len = caml_string_length(Field(Field(vheader,5),0)) + 1;
+    memcpy(p, String_val(Field(Field(vheader,5),0)), len);
+    header->name = p;
+    p += len;
+  }
+
+  /* comment */
+  if (Is_block(Field(vheader,6))) {
+    /* zlib *does* expect this string to be zero-terminated - add one.
+     * OCaml strings are zery-terminated, just copy the final '\0', too. */
+    len = caml_string_length(Field(Field(vheader,6),0)) + 1;
+    memcpy(p, String_val(Field(Field(vheader,6),0)), len);
+    header->comment = p;
+    p += len;
+  }
 
   zlib_error(zstrm,
       deflateSetHeader(zstrm, header));
@@ -333,7 +353,7 @@ CAMLprim value zlib_get_header(value vstrm)
   CAMLparam1(vstrm);
   CAMLlocal5(vheader, extra, comment, name, tmp);
   struct wrap_strm *wrap = Data_custom_val(vstrm);
-  gz_headerp header = &wrap->header->zheader;
+  gz_header *header = wrap->header;
   int len;
 
   assert(wrap->flags & ZLIB_INFLATE);
