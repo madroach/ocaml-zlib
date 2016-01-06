@@ -214,9 +214,13 @@ CAMLprim value zlib_reset(value vstrm)
 
   struct wrap_strm *wrap = Data_custom_val(Field(vstrm,0));
   z_streamp zstrm = wrap->zstrm;
+  gz_headerp header = wrap->header;
 
-  if (wrap->flags & ZLIB_INFLATE)
+  if (wrap->flags & ZLIB_INFLATE) {
     ret = inflateReset(zstrm);
+    if (header != NULL)
+      zlib_error(zstrm, inflateGetHeader(zstrm, header));
+  }
   else
     ret = deflateReset(zstrm);
 
