@@ -13,6 +13,8 @@ BuildTools:	ocamlbuild
 Plugins:	META (0.4)
 AlphaFeatures:	ocamlbuild_more_args
 
+XOCamlbuildExtraArgs:	-classic-display
+
 
 SourceRepository master
   Type: git
@@ -35,9 +37,9 @@ Document "zlib_api"
 
   Title: API reference for Zlib
   XOCamlbuildPath: .
+  XOCamlbuildLibraries: zlib
   XOCamlbuildExtraArgs:
     "-docflags '-colorize-code -short-functors -charset utf-8'"
-  XOCamlbuildLibraries: zlib
 
 Executable "test"
   Path:			test
