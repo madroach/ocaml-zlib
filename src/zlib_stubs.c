@@ -39,7 +39,7 @@ value zlib_adler32(value vadler, value vbuf)
 	caml_string_length(vbuf)));
 }
 
-value zlib_error(z_streamp zstrm, int error)
+value zlib_error(z_streamp strm, int error)
 {
   switch (error)
   {
@@ -53,13 +53,13 @@ value zlib_error(z_streamp zstrm, int error)
       return Val_int(4);
 
     case Z_VERSION_ERROR:
-      caml_failwith(zstrm->msg ? zstrm->msg : "Zlib version error");
+      caml_failwith(strm->msg ? strm->msg : "Zlib version error");
       break;
     case Z_MEM_ERROR:
       caml_raise_out_of_memory();
       break;
     case Z_STREAM_ERROR:
-      caml_invalid_argument(zstrm->msg ? zstrm->msg : "Zlib stream error");
+      caml_invalid_argument(strm->msg ? strm->msg : "Zlib stream error");
       break;
     case Z_ERRNO:
       /* strerror is not thread-safe,
@@ -75,8 +75,8 @@ value zlib_error(z_streamp zstrm, int error)
 }
 
 struct wrap_strm {
-  z_streamp zstrm;
-  gz_header *header;
+  z_streamp strm;
+  gz_headerp header;
   int flags;
 };
 #define ZLIB_INFLATE 1
@@ -89,12 +89,12 @@ void zlib_finalize(value vwrap)
   int ret;
 
   if (wrap->flags & ZLIB_INFLATE)
-    ret = inflateEnd(wrap->zstrm);
+    ret = inflateEnd(wrap->strm);
   else
-    ret = deflateEnd(wrap->zstrm);
+    ret = deflateEnd(wrap->strm);
 
   assert(ret == Z_OK || ret == Z_DATA_ERROR);
-  caml_stat_free(wrap->zstrm);
+  caml_stat_free(wrap->strm);
   caml_stat_free(wrap->header);
 }
 
@@ -109,13 +109,13 @@ CAMLprim value zlib_deflate_init(
 {
   value vwrap;
   struct wrap_strm *wrap;
-  z_streamp zstrm;
+  z_streamp strm;
   size_t memory;
 
   assert(Is_long(strategy) && Is_long(method) && 0 == Long_val(method));
 
-  zstrm = caml_stat_alloc(sizeof(z_stream));
-  memset(zstrm, 0, sizeof(z_stream));
+  strm = caml_stat_alloc(sizeof(z_stream));
+  memset(strm, 0, sizeof(z_stream));
 
   /* From zconf.h:
      The memory requirements for deflate are (in bytes):
@@ -134,12 +134,12 @@ CAMLprim value zlib_deflate_init(
   memory += 1 << (Int_val(memLevel) + 9);
   vwrap = caml_alloc_final(WRAP_STRM_WOSIZE, zlib_finalize, memory, ZLIB_MAX_MEMORY);
   wrap = Data_custom_val(vwrap);
-  wrap->zstrm = zstrm;
+  wrap->strm = strm;
   wrap->header = NULL;
   wrap->flags = 0;
 
-  zlib_error(zstrm,
-      deflateInit2(zstrm,
+  zlib_error(strm,
+      deflateInit2(strm,
 	Int_val(level),
 	Z_DEFLATED,
 	Int_val(windowBits),
@@ -153,8 +153,8 @@ CAMLprim value zlib_inflate_init(value windowBits)
 {
   value vwrap;
   struct wrap_strm *wrap;
-  z_streamp zstrm;
-  gz_header *header = NULL;
+  z_streamp strm;
+  gz_headerp header = NULL;
   size_t memory = 0;
   const int wBits = Int_val(windowBits);
 
@@ -182,12 +182,12 @@ CAMLprim value zlib_inflate_init(value windowBits)
 
   wrap->flags = ZLIB_INFLATE;
   wrap->header = header;
-  wrap->zstrm = zstrm = caml_stat_alloc(sizeof(z_stream));
-  memset(zstrm, 0, sizeof(z_stream));
+  wrap->strm = strm = caml_stat_alloc(sizeof(z_stream));
+  memset(strm, 0, sizeof(z_stream));
 
-  zlib_error(zstrm, inflateInit2(zstrm, wBits));
+  zlib_error(strm, inflateInit2(strm, wBits));
   if (header != NULL)
-    zlib_error(zstrm, inflateGetHeader(zstrm, header));
+    zlib_error(strm, inflateGetHeader(strm, header));
 
   return vwrap;
 }
@@ -199,7 +199,7 @@ CAMLprim value zlib_deflate_bound(value vwrap, value len)
 
   assert((wrap->flags & ZLIB_INFLATE) == 0);
 
-  ret = deflateBound(wrap->zstrm, Long_val(len));
+  ret = deflateBound(wrap->strm, Long_val(len));
 
   if (ret < 0)
     caml_failwith("Zlib.deflate_bound");
@@ -213,28 +213,28 @@ CAMLprim value zlib_reset(value vstrm)
   int ret;
 
   struct wrap_strm *wrap = Data_custom_val(Field(vstrm,0));
-  z_streamp zstrm = wrap->zstrm;
+  z_streamp strm = wrap->strm;
   gz_headerp header = wrap->header;
 
   if (wrap->flags & ZLIB_INFLATE) {
-    ret = inflateReset(zstrm);
+    ret = inflateReset(strm);
     if (header != NULL)
-      zlib_error(zstrm, inflateGetHeader(zstrm, header));
+      zlib_error(strm, inflateGetHeader(strm, header));
   }
   else
-    ret = deflateReset(zstrm);
+    ret = deflateReset(strm);
 
   Field(vstrm, 3) = Val_long(0);
   Field(vstrm, 4) = Val_long(0);
   Field(vstrm, 5) = Val_long(-1);
   Field(vstrm, 6) = Val_long(-1);
-  Field(vstrm, 7) = Val_long(zstrm->total_in);
-  Field(vstrm, 8) = Val_long(zstrm->total_out);
+  Field(vstrm, 7) = Val_long(strm->total_in);
+  Field(vstrm, 8) = Val_long(strm->total_out);
   Field(vstrm, 9) = Val_long(Z_UNKNOWN);
-  Store_field(vstrm,10, caml_copy_int32(zstrm->adler));
-  Store_field(vstrm,10, caml_copy_int32(zstrm->adler));
+  Store_field(vstrm,10, caml_copy_int32(strm->adler));
+  Store_field(vstrm,10, caml_copy_int32(strm->adler));
 
-  zlib_error(zstrm, ret);
+  zlib_error(strm, ret);
 
   CAMLreturn(Val_unit);
 }
@@ -242,28 +242,28 @@ CAMLprim value zlib_reset(value vstrm)
 CAMLprim value zlib_deflate_set_dictionary(value vstrm, value vdict)
 {
   struct wrap_strm *wrap = Data_custom_val(vstrm);
-  z_streamp zstrm = wrap->zstrm;
+  z_streamp strm = wrap->strm;
 
   assert((wrap->flags & ZLIB_INFLATE) == 0);
 
-  zlib_error(zstrm,
-      deflateSetDictionary(zstrm,
+  zlib_error(strm,
+      deflateSetDictionary(strm,
 	(Bytef *)String_val(vdict),
 	caml_string_length(vdict)));
 
-  return caml_copy_int32(zstrm->adler);
+  return caml_copy_int32(strm->adler);
 }
 
 CAMLprim value zlib_inflate_set_dictionary(value vstrm, value vdict)
 {
   struct wrap_strm *wrap = Data_custom_val(vstrm);
-  z_streamp zstrm = wrap->zstrm;
+  z_streamp strm = wrap->strm;
 
   assert(wrap->flags & ZLIB_INFLATE);
 
   return
-    zlib_error(zstrm,
-	inflateSetDictionary(zstrm,
+    zlib_error(strm,
+	inflateSetDictionary(strm,
 	  (Bytef *)String_val(vdict),
 	  caml_string_length(vdict)));
 }
@@ -271,8 +271,8 @@ CAMLprim value zlib_inflate_set_dictionary(value vstrm, value vdict)
 CAMLprim value zlib_set_header(value vstrm, value vheader)
 {
   struct wrap_strm *wrap = Data_custom_val(vstrm);
-  z_streamp zstrm = wrap->zstrm;
-  gz_header *header;
+  z_streamp strm = wrap->strm;
+  gz_headerp header;
   Bytef *p;
   size_t len = sizeof(gz_header);
 
@@ -346,8 +346,8 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
     p += len;
   }
 
-  zlib_error(zstrm,
-      deflateSetHeader(zstrm, header));
+  zlib_error(strm,
+      deflateSetHeader(strm, header));
 
   return Val_unit;
 }
@@ -357,7 +357,7 @@ CAMLprim value zlib_get_header(value vstrm)
   CAMLparam1(vstrm);
   CAMLlocal5(vheader, extra, comment, name, tmp);
   struct wrap_strm *wrap = Data_custom_val(vstrm);
-  gz_header *header = wrap->header;
+  gz_headerp header = wrap->header;
   int len;
 
   assert(wrap->flags & ZLIB_INFLATE);
@@ -420,7 +420,7 @@ CAMLprim value zlib_flate(value vstrm, value flush)
   CAMLparam2(vstrm, flush);
   int ret;
   struct wrap_strm *wrap = Data_custom_val(Field(vstrm,0));
-  z_streamp zstrm = wrap->zstrm;
+  z_streamp strm = wrap->strm;
 
   assert(Is_long(flush));
   assert(Caml_ba_array_val(Field(vstrm, 1))->num_dims == 1);
@@ -428,50 +428,50 @@ CAMLprim value zlib_flate(value vstrm, value flush)
 # define LField(n) Long_val(Field(vstrm,(n)))
 
   /* By default use whole bigarray */
-  zstrm->avail_in   = Caml_ba_array_val(Field(vstrm, 1))->dim[0];
-  zstrm->avail_out  = Caml_ba_array_val(Field(vstrm, 2))->dim[0];
+  strm->avail_in   = Caml_ba_array_val(Field(vstrm, 1))->dim[0];
+  strm->avail_out  = Caml_ba_array_val(Field(vstrm, 2))->dim[0];
   /* if offset is given, trim length accordingly. */
-  zstrm->avail_in  -= LField(3);
-  zstrm->avail_out -= LField(4);
+  strm->avail_in  -= LField(3);
+  strm->avail_out -= LField(4);
   /* given substring inside bigarray bounds? */
   if (LField(3) < 0 || LField(4) < 0 ||
-      LField(5) > zstrm->avail_in || LField(6) > zstrm->avail_out)
+      LField(5) > strm->avail_in || LField(6) > strm->avail_out)
     caml_invalid_argument("Zlib.flate");
   /* if given length is negative use default and return it. */
   if (LField(5) < 0)
-    Field(vstrm,5)  = Val_long(zstrm->avail_in);
+    Field(vstrm,5)  = Val_long(strm->avail_in);
   else
-    zstrm->avail_in  = LField(5);
+    strm->avail_in  = LField(5);
   if (LField(6) < 0)
-    Field(vstrm,6)  = Val_long(zstrm->avail_out);
+    Field(vstrm,6)  = Val_long(strm->avail_out);
   else
-    zstrm->avail_out = LField(6);
+    strm->avail_out = LField(6);
 
-  assert(zstrm->avail_in == LField(5));
-  assert(zstrm->avail_out == LField(6));
+  assert(strm->avail_in == LField(5));
+  assert(strm->avail_out == LField(6));
 
-  zstrm->next_in   = (Byte *)Caml_ba_data_val(Field(vstrm, 1)) + LField(3);
-  zstrm->next_out  = (Byte *)Caml_ba_data_val(Field(vstrm, 2)) + LField(4);
+  strm->next_in   = (Byte *)Caml_ba_data_val(Field(vstrm, 1)) + LField(3);
+  strm->next_out  = (Byte *)Caml_ba_data_val(Field(vstrm, 2)) + LField(4);
 
   if (wrap->flags & ZLIB_INFLATE) {
     caml_release_runtime_system();
-    ret = inflate(zstrm, Int_val(flush));
+    ret = inflate(strm, Int_val(flush));
   }
   else {
     caml_release_runtime_system();
-    ret = deflate(zstrm, Int_val(flush));
+    ret = deflate(strm, Int_val(flush));
   }
   caml_acquire_runtime_system();
 
   /* Long overwriting long can be assigned directly without caml_modify */
-  Field(vstrm, 3) = Val_long(LField(3) + (LField(5) - zstrm->avail_in));
-  Field(vstrm, 4) = Val_long(LField(4) + (LField(6) - zstrm->avail_out));
-  Field(vstrm, 5) = Val_long(zstrm->avail_in);
-  Field(vstrm, 6) = Val_long(zstrm->avail_out);
-  Field(vstrm, 7) = Val_long(zstrm->total_in);
-  Field(vstrm, 8) = Val_long(zstrm->total_out);
-  Field(vstrm, 9) = Val_long(zstrm->data_type);
-  Store_field(vstrm,10, caml_copy_int32(zstrm->adler));
+  Field(vstrm, 3) = Val_long(LField(3) + (LField(5) - strm->avail_in));
+  Field(vstrm, 4) = Val_long(LField(4) + (LField(6) - strm->avail_out));
+  Field(vstrm, 5) = Val_long(strm->avail_in);
+  Field(vstrm, 6) = Val_long(strm->avail_out);
+  Field(vstrm, 7) = Val_long(strm->total_in);
+  Field(vstrm, 8) = Val_long(strm->total_out);
+  Field(vstrm, 9) = Val_long(strm->data_type);
+  Store_field(vstrm,10, caml_copy_int32(strm->adler));
 
-  CAMLreturn(zlib_error(zstrm, ret));
+  CAMLreturn(zlib_error(strm, ret));
 }
