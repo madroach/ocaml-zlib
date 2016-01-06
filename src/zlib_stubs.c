@@ -367,10 +367,12 @@ CAMLprim value zlib_get_header(value vstrm)
   assert(header->done == 1);
 
   if (header->extra != NULL) {
-    tmp = caml_alloc_string(header->extra_len);
+    len = header->extra_len < header->extra_max
+	? header->extra_len : header->extra_max;
+    tmp = caml_alloc_string(len);
+    memcpy(String_val(tmp), header->extra, len);
     extra = caml_alloc_small(1, 0);
     Field(extra,0) = tmp;
-    memcpy(String_val(tmp), header->extra, header->extra_len);
   }
   else
     extra = Val_int(0);
