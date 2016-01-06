@@ -65,7 +65,7 @@ type 'a t =
 
 type header =
   { text        :bool
-  ; mtime       :float
+  ; mtime       :int32
   ; os          :int
   ; xflags      :int
   ; extra       :string option

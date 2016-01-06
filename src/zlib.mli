@@ -113,7 +113,7 @@ type 'a t =
 type header =
   { text        :bool
     (** Compressed data believed to be text? *)
-  ; mtime       :float
+  ; mtime       :int32
     (** mtime of compressed file. Set to [0.] if unknown. *)
   ; os          :int
     (** filesystem type on which the compressed file was stored.

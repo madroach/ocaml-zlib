@@ -99,7 +99,7 @@ let () =
     { Zlib.
       text    = true
     ; xflags  = 0
-    ; mtime   = Unix.time ()
+    ; mtime   = Int32.of_float (Unix.time ())
     ; os      = 3
     ; extra   = Some "This is an extra string"
     ; name    = Some ("This is the filename" ^ String.make 576 '#')

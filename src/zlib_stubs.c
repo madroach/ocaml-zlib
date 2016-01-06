@@ -311,8 +311,7 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
 
   memset(header, 0, sizeof(gz_header));
   header->text =    Int_val(Field(vheader,0));
-  /* XXX use int64 instead ? */
-  header->time = Double_val(Field(vheader,1));
+  header->time = Int32_val(Field(vheader,1));
   header->os   =   Long_val(Field(vheader,2));
   p = (Bytef *)header + sizeof(gz_header);
 
@@ -401,7 +400,7 @@ CAMLprim value zlib_get_header(value vstrm)
   else
     comment = Val_int(0);
 
-  tmp = caml_copy_double(header->time);
+  tmp = caml_copy_int32(header->time);
 
   vheader = caml_alloc_small(7, 0);
   Field(vheader,0) = Val_int(header->text);
