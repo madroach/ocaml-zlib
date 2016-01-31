@@ -114,7 +114,7 @@ type header =
   { text        :bool
     (** Compressed data believed to be text? *)
   ; mtime       :int32
-    (** mtime of compressed file. Set to [0.] if unknown. *)
+    (** mtime of compressed file. Set to zero if unknown. *)
   ; os          :int
     (** filesystem type on which the compressed file was stored.
         See {{: https://www.ietf.org/rfc/rfc1952.txt } RFC1952 } for possible values. *)
