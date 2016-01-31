@@ -1,7 +1,7 @@
 OASISFormat:	0.4
 
 Name:		zlib
-Version:	0.4
+Version:	0.5
 Synopsis:	Bindings to zlib, a deflate compression library
 Authors:	Christopher Zimmermann <christopher@gmerlin.de>
 License:	ISC
