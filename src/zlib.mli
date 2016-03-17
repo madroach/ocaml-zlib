@@ -29,7 +29,7 @@
    @author Christopher Zimmermann
 *)
 
-type status = 
+type status =
   | Ok                (** 0 *)
   | Stream_end        (** 1 *)
   | Need_dict         (** 2 *)
@@ -133,7 +133,7 @@ type header =
 (** Record holding the data in a gzip header *)
 
 val create_inflate : ?window_bits:int -> unit -> inflate t
-(** [inflate_init window_bits]
+(** [create_inflate ()]
                         Creates zlib internal state and buffer description for
                         decompression.
     @param window_bits  the base 2 logarithm of the maximum window size. It
@@ -153,7 +153,7 @@ val create_deflate :
   ?memory:int ->
   ?strategy:strategy ->
   unit -> deflate t
-(** [create_inflate ()] Creates zlib internal {!state} and buffer description
+(** [create_deflate ()] Creates zlib internal {!state} and buffer description
                         for compression.
     @param level        the compression level must be betweed [-1] and [9].
                         [-1] selects default compression level, [1] gives best
@@ -181,7 +181,7 @@ external deflate_init :
   level:int -> algo:algo -> window_bits:int -> memory:int -> strategy:strategy
   -> deflate state
   = "zlib_deflate_init"
-(** [inflate_init level algo window_bits memory] like {!create_deflate}, but
+(** [deflate_init level algo window_bits memory strategy] like {!create_deflate}, but
     only creates the internal {!state}. *)
 
 external deflate_bound : deflate state -> int -> int = "zlib_deflate_bound"
@@ -242,7 +242,7 @@ external get_header : inflate state -> header         = "zlib_get_header"
 *)
 
 external set_header : deflate state -> header -> unit = "zlib_set_header"
-(** [set_header header] Provide a header when writing the gzip format. Must be
+(** [set_header state header] Provide a header when writing the gzip format. Must be
                         called before any call to {!flate}.
     @param header       fields to be stored th the header. The {!header.xflags} field
                         is not used when compressing.
