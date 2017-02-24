@@ -1,0 +1,106 @@
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Zlib" rel="Chapter" href="Zlib.html"><title>Index of values</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;</div>
+<h1>Index of values</h1>
+<table>
+<tr><td align="left"><br>A</td></tr>
+<tr><td><a href="Zlib.html#VALadler32">adler32</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">adler32 cksum buf</code> Updates the running adler32 checksum
+</div>
+</td></tr>
+<tr><td><a href="Zlib.html#VALadler32_empty">adler32_empty</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+Initial value to be used with <a href="Zlib.html#VALadler32"><code class="code"><span class="constructor">Zlib</span>.adler32</code></a>
+</div>
+</td></tr>
+<tr><td align="left"><br>C</td></tr>
+<tr><td><a href="Zlib.html#VALcreate_deflate">create_deflate</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">create_deflate ()</code> Creates zlib internal <a href="Zlib.html#TYPEstate"><code class="code"><span class="constructor">Zlib</span>.state</code></a> and buffer description
+                        for compression.
+</div>
+</td></tr>
+<tr><td><a href="Zlib.html#VALcreate_inflate">create_inflate</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">create_inflate ()</code>
+                        Creates zlib internal state and buffer description for
+                        decompression.
+</div>
+</td></tr>
+<tr><td align="left"><br>D</td></tr>
+<tr><td><a href="Zlib.html#VALdeflate_bound">deflate_bound</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">deflate_bound state len</code> calculates an upper bound on the size of the
+                        compressed data.
+</div>
+</td></tr>
+<tr><td><a href="Zlib.html#VALdeflate_init">deflate_init</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">deflate_init level algo window_bits memory strategy</code> like <a href="Zlib.html#VALcreate_deflate"><code class="code"><span class="constructor">Zlib</span>.create_deflate</code></a>, but
+    only creates the internal <a href="Zlib.html#TYPEstate"><code class="code"><span class="constructor">Zlib</span>.state</code></a>.
+</div>
+</td></tr>
+<tr><td><a href="Zlib.html#VALdeflate_set_dictionary">deflate_set_dictionary</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">deflate_set_dictionary state dict</code> Sets a preset dictionary for
+                        compression.
+</div>
+</td></tr>
+<tr><td align="left"><br>F</td></tr>
+<tr><td><a href="Zlib.html#VALflate">flate</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">flate buffers flush</code> (de)compresses data from the provided input to the
+                        output buffers.
+</div>
+</td></tr>
+<tr><td align="left"><br>G</td></tr>
+<tr><td><a href="Zlib.html#VALget_data_type">get_data_type</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">get_data_type buffers</code> gets the data type of the data being compressed.
+</div>
+</td></tr>
+<tr><td><a href="Zlib.html#VALget_header">get_header</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">get_header header</code> Retrieve a header after a gzip header has been read by
+                        <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a>.
+</div>
+</td></tr>
+<tr><td align="left"><br>I</td></tr>
+<tr><td><a href="Zlib.html#VALinflate_init">inflate_init</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">inflate_init window_bits</code> like <a href="Zlib.html#VALcreate_inflate"><code class="code"><span class="constructor">Zlib</span>.create_inflate</code></a>, but only creates the
+    internal <a href="Zlib.html#TYPEstate"><code class="code"><span class="constructor">Zlib</span>.state</code></a>.
+</div>
+</td></tr>
+<tr><td><a href="Zlib.html#VALinflate_set_dictionary">inflate_set_dictionary</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">inflate_set_dictionary state dict</code> Sets a preset dictionary for
+                        decompression.
+</div>
+</td></tr>
+<tr><td align="left"><br>R</td></tr>
+<tr><td><a href="Zlib.html#VALreset">reset</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">reset buffers</code>     Prepares for a new stream of data to be (de)compressed.
+</div>
+</td></tr>
+<tr><td align="left"><br>S</td></tr>
+<tr><td><a href="Zlib.html#VALset_header">set_header</a> [<a href="Zlib.html">Zlib</a>]</td>
+<td><div class="info">
+<code class="code">set_header state header</code> Provide a header when writing the gzip format.
+</div>
+</td></tr>
+</table>
+</body>
+</html>

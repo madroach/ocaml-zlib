@@ -59,14 +59,14 @@ type flush =
   | Block             (** 5 *)
   | Trees             (** 6 *)
 (** The type of the flush parameter passed to flate.
-   Use [Finish] when all input has been provided, otherwise use [No_flush]
+   Use [Finish] when all input has been provided, otherwise use [No_flush].
    For the other flush values see the zlib manual. *)
 
 type data_type =
   | Binary            (** 0 *)
   | Text              (** 1 *)
   | Unknown           (** 2 *)
-(** Best guess of flate about the type of data being compressed *)
+(** Best guess of flate about the type of data being compressed. *)
 
 type deflate
 type inflate
@@ -74,7 +74,7 @@ type inflate
    deflate. *)
 
 type 'a state
-(** Holds the internal state of zlib and the binding library *)
+(** Holds the internal state of zlib and the binding library. *)
 type 'a t =
   { state :'a state
   ; mutable in_ba     :((char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t)
@@ -130,7 +130,7 @@ type header =
     (** File comment. According to {{: https://www.ietf.org/rfc/rfc1952.txt } RFC1952 } only ISO 8859-1 (LATIN-1) characters
         are allowed. Linebreak is a single linefeed. *)
   }
-(** Record holding the data in a gzip header *)
+(** Record holding the data in a gzip header. *)
 
 val create_inflate : ?window_bits:int -> unit -> inflate t
 (** [create_inflate ()]

@@ -1,0 +1,622 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Zlib" rel="Chapter" href="Zlib.html"><title>Zlib</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;</div>
+<h1>Module <a href="type_Zlib.html">Zlib</a></h1>
+
+<pre><span class="keyword">module</span> Zlib: <code class="code"><span class="keyword">sig</span></code> <a href="Zlib.html">..</a> <code class="code"><span class="keyword">end</span></code></pre><div class="info module top">
+Bindings to the zlib compression library providing deflate compression with
+   or without zlib or gzip headers.
+<p>
+
+   This library uses bigarrays as buffers and can therefore release the OCaml
+   runtime during (de)compression, allowing other OCaml threads to continue.<br>
+<b>Author(s):</b> Christopher Zimmermann<br>
+<b>See also</b><ul><li><a href="https://github.com/madroach/ocaml-zlib">latest version on github</a></li>
+<li><a href="http://zlib.net/manual.html">Zlib manual</a></li>
+<li><a href="http://zlib.net/">Zlib homepage</a></li>
+</ul>
+</div>
+<hr width="100%">
+
+<pre><code><span id="TYPEstatus"><span class="keyword">type</span> <code class="type"></code>status</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstatus.Ok"><span class="constructor">Ok</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+0<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstatus.Stream_end"><span class="constructor">Stream_end</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+1<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstatus.Need_dict"><span class="constructor">Need_dict</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+2<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstatus.Buf_error"><span class="constructor">Buf_error</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+3 (zlib -5)<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstatus.Data_error"><span class="constructor">Data_error</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+4 (zlib -3)<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+
+<div class="info ">
+Zlib return codes. Only non-fatal return codes are returned. Fatal error
+   codes are translated to the standard exceptions <code class="code"><span class="constructor">Failure</span> _</code>,
+   <code class="code"><span class="constructor">Invalid_argument</span> _</code> or <code class="code"><span class="constructor">Out_of_memory</span></code>.<br>
+</div>
+
+
+<pre><code><span id="TYPEalgo"><span class="keyword">type</span> <code class="type"></code>algo</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTalgo.Deflated"><span class="constructor">Deflated</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Compression algorithm. Only deflate is provided by current zlib.<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+
+
+
+<pre><code><span id="TYPEstrategy"><span class="keyword">type</span> <code class="type"></code>strategy</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstrategy.Default_strategy"><span class="constructor">Default_strategy</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+0<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstrategy.Filtered"><span class="constructor">Filtered</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+1<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstrategy.Huffman_only"><span class="constructor">Huffman_only</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+2<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstrategy.RLE"><span class="constructor">RLE</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+3<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTstrategy.Fixed"><span class="constructor">Fixed</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+4<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+
+<div class="info ">
+Compression strategy - see zlib manual for details.<br>
+</div>
+
+
+<pre><code><span id="TYPEflush"><span class="keyword">type</span> <code class="type"></code>flush</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTflush.No_flush"><span class="constructor">No_flush</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+0<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTflush.Partial_flush"><span class="constructor">Partial_flush</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+1<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTflush.Sync_flush"><span class="constructor">Sync_flush</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+2<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTflush.Full_flush"><span class="constructor">Full_flush</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+3<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTflush.Finish"><span class="constructor">Finish</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+4<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTflush.Block"><span class="constructor">Block</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+5<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTflush.Trees"><span class="constructor">Trees</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+6<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+
+<div class="info ">
+The type of the flush parameter passed to flate.
+   Use <code class="code"><span class="constructor">Finish</span></code> when all input has been provided, otherwise use <code class="code"><span class="constructor">No_flush</span></code>.
+   For the other flush values see the zlib manual.<br>
+</div>
+
+
+<pre><code><span id="TYPEdata_type"><span class="keyword">type</span> <code class="type"></code>data_type</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdata_type.Binary"><span class="constructor">Binary</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+0<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdata_type.Text"><span class="constructor">Text</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+1<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTdata_type.Unknown"><span class="constructor">Unknown</span></span></code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+2<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+
+<div class="info ">
+Best guess of flate about the type of data being compressed.<br>
+</div>
+
+
+<pre><span id="TYPEdeflate"><span class="keyword">type</span> <code class="type"></code>deflate</span> </pre>
+
+
+<pre><span id="TYPEinflate"><span class="keyword">type</span> <code class="type"></code>inflate</span> </pre>
+<div class="info ">
+Pseudo types to specify whether a zlib stream state is used to inflate or
+   deflate.<br>
+</div>
+
+
+<pre><span id="TYPEstate"><span class="keyword">type</span> <code class="type">'a</code> state</span> </pre>
+<div class="info ">
+Holds the internal state of zlib and the binding library.<br>
+</div>
+
+
+<pre><code><span id="TYPEt"><span class="keyword">type</span> <code class="type">'a</code> t</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.state">state</span>&nbsp;: <code class="type">'a <a href="Zlib.html#TYPEstate">state</a></code>;</code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.in_ba">in_ba</span>&nbsp;: <code class="type">(char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+bigarray input buffer<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.out_ba">out_ba</span>&nbsp;: <code class="type">(char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+bigarray output buffer<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.in_ofs">in_ofs</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+offset into the input buffer<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.out_ofs">out_ofs</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+offset into the output buffer<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.in_len">in_len</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Length of available input data<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.out_len">out_len</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Length of available output data<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.in_total">in_total</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Length of input data processed so far<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.out_total">out_total</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Length of output data processed so far<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.data_type">data_type</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+For deflate streams a guess about the type of data is returned here: <code class="code">0</code>
+        for binary data, <code class="code">1</code> for text and <code class="code">2</code> for unknown.
+<p>
+
+        For inflate streams the number of unused bits in the last byte taken
+        from the input stream is stored here.
+        If <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a> just finished decoding the header or returned after an
+        end-of-block code <code class="code">128</code> is added.
+        If <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a> is currentry decoding the last block <code class="code">64</code> is added.<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span class="keyword">mutable&nbsp;</span><span id="TYPEELTt.cksum">cksum</span>&nbsp;: <code class="type">int32</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+The checksum of the decompressed data produced resp. consumed so far.
+        When <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a> returns <a href="Zlib.html#TYPEELTstatus.Need_dict"><code class="code"><span class="constructor">Zlib</span>.status.<span class="constructor">Need_dict</span></code></a> the adler32 checksum of the required
+        dictionary is returned here instead.<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+}
+
+<div class="info ">
+Record holding the internal state and input / output buffers of data as
+    well as other data returned from the zlib inflate and deflate routines.<br>
+</div>
+
+
+<pre><code><span id="TYPEheader"><span class="keyword">type</span> <code class="type"></code>header</span> = {</code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTheader.text">text</span>&nbsp;: <code class="type">bool</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Compressed data believed to be text?<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTheader.mtime">mtime</span>&nbsp;: <code class="type">int32</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+mtime of compressed file. Set to zero if unknown.<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTheader.os">os</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+filesystem type on which the compressed file was stored.
+        See <a href=" https://www.ietf.org/rfc/rfc1952.txt "> RFC1952 </a> for possible values.<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTheader.xflags">xflags</span>&nbsp;: <code class="type">int</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Extra flags according to <a href=" https://www.ietf.org/rfc/rfc1952.txt "> RFC1952 </a>. For deflate compression method the
+        compression level is stored here.<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTheader.extra">extra</span>&nbsp;: <code class="type">string option</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Extra header field according to <a href=" https://www.ietf.org/rfc/rfc1952.txt "> RFC1952 </a>.<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTheader.name">name</span>&nbsp;: <code class="type">string option</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+Original file name of the compressed file translated to ISO 8859-1
+        (LATIN-1).<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code>&nbsp;&nbsp;</code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTheader.comment">comment</span>&nbsp;: <code class="type">string option</code>;</code></td>
+<td class="typefieldcomment" align="left" valign="top" ><code>(*</code></td><td class="typefieldcomment" align="left" valign="top" ><div class="info ">
+File comment. According to <a href=" https://www.ietf.org/rfc/rfc1952.txt "> RFC1952 </a> only ISO 8859-1 (LATIN-1) characters
+        are allowed. Linebreak is a single linefeed.<br>
+</div>
+</td><td class="typefieldcomment" align="left" valign="bottom" ><code>*)</code></td>
+</tr></table>
+}
+
+<div class="info ">
+Record holding the data in a gzip header.<br>
+</div>
+
+
+<pre><span id="VALcreate_inflate"><span class="keyword">val</span> create_inflate</span> : <code class="type">?window_bits:int -> unit -> <a href="Zlib.html#TYPEinflate">inflate</a> <a href="Zlib.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">create_inflate ()</code>
+                        Creates zlib internal state and buffer description for
+                        decompression.<br>
+</div>
+<div class="param_info"><code class="code">window_bits</code> : the base 2 logarithm of the maximum window size. It
+                        should be in tha range 8..15 and greater or equal to
+                        the <code class="code">window_bits</code> parameter used for compression.
+                        By default the zlib format is decoded.
+                        Use a negative value -8..-15 for raw deflate
+                        decompression without zlib or gzip header.
+                        Add <code class="code">16</code> to <code class="code">window_bits</code> to decode the gzip format.
+                        Add <code class="code">32</code> to <code class="code">window_bits</code> to decode zlib or gzip format
+                        with automatic header detection.</div>
+
+<pre><span id="VALcreate_deflate"><span class="keyword">val</span> create_deflate</span> : <code class="type">?level:int -><br>       ?algo:<a href="Zlib.html#TYPEalgo">algo</a> -><br>       ?window_bits:int -><br>       ?memory:int -> ?strategy:<a href="Zlib.html#TYPEstrategy">strategy</a> -> unit -> <a href="Zlib.html#TYPEdeflate">deflate</a> <a href="Zlib.html#TYPEt">t</a></code></pre><div class="info ">
+<code class="code">create_deflate ()</code> Creates zlib internal <a href="Zlib.html#TYPEstate"><code class="code"><span class="constructor">Zlib</span>.state</code></a> and buffer description
+                        for compression.<br>
+</div>
+<div class="param_info"><code class="code">level</code> : the compression level must be betweed <code class="code">-1</code> and <code class="code">9</code>.
+                        <code class="code">-1</code> selects default compression level, <code class="code">1</code> gives best
+                        speed <code class="code">9</code> gives best compression, anything in between
+                        is a compromise of speed/compression. <code class="code">0</code> gives no
+                        compression at all.</div>
+<div class="param_info"><code class="code">algo</code> : Only <a href="Zlib.html#TYPEELTalgo.Deflated"><code class="code"><span class="constructor">Zlib</span>.algo.<span class="constructor">Deflated</span></code></a> available at the moment.</div>
+<div class="param_info"><code class="code">window_bits</code> : the base 2 logarithm of the maximum window size. It
+                        should be in tha range 8..15 and greater or equal to
+                        the <code class="code">window_bits</code> parameter used for compression.
+                        Use a negative value -8..-15 for raw deflate
+                        compression without zlib or gzip header.
+                        Add 16 to <code class="code">window_bits</code> to write a gzip header.</div>
+<div class="param_info"><code class="code">memory</code> : selects how much memory to use for compression in the
+                        range 1..9. More memory means faster and better
+                        compression.
+                        A value of <code class="code">9</code> uses 256kb, <code class="code">8</code> 128kb, <code class="code">7</code> 64kb...</div>
+<div class="param_info"><code class="code">strategy</code> : See the zlib manual for details about this parameter.</div>
+
+<pre><span id="VALinflate_init"><span class="keyword">val</span> inflate_init</span> : <code class="type">window_bits:int -> <a href="Zlib.html#TYPEinflate">inflate</a> <a href="Zlib.html#TYPEstate">state</a></code></pre><div class="info ">
+<code class="code">inflate_init window_bits</code> like <a href="Zlib.html#VALcreate_inflate"><code class="code"><span class="constructor">Zlib</span>.create_inflate</code></a>, but only creates the
+    internal <a href="Zlib.html#TYPEstate"><code class="code"><span class="constructor">Zlib</span>.state</code></a>.<br>
+</div>
+
+<pre><span id="VALdeflate_init"><span class="keyword">val</span> deflate_init</span> : <code class="type">level:int -><br>       algo:<a href="Zlib.html#TYPEalgo">algo</a> -><br>       window_bits:int -><br>       memory:int -> strategy:<a href="Zlib.html#TYPEstrategy">strategy</a> -> <a href="Zlib.html#TYPEdeflate">deflate</a> <a href="Zlib.html#TYPEstate">state</a></code></pre><div class="info ">
+<code class="code">deflate_init level algo window_bits memory strategy</code> like <a href="Zlib.html#VALcreate_deflate"><code class="code"><span class="constructor">Zlib</span>.create_deflate</code></a>, but
+    only creates the internal <a href="Zlib.html#TYPEstate"><code class="code"><span class="constructor">Zlib</span>.state</code></a>.<br>
+</div>
+
+<pre><span id="VALdeflate_bound"><span class="keyword">val</span> deflate_bound</span> : <code class="type"><a href="Zlib.html#TYPEdeflate">deflate</a> <a href="Zlib.html#TYPEstate">state</a> -> int -> int</code></pre><div class="info ">
+<code class="code">deflate_bound state len</code> calculates an upper bound on the size of the
+                        compressed data. This functions assumes the zlib format
+                        is used. The resulting compressed size might be larger
+                        than the returned bound when the gzip format is being
+                        used.<br>
+<b>Returns</b> An upper bound on the compressed data when using the
+                        zlib format.<br>
+</div>
+
+<pre><span id="VALflate"><span class="keyword">val</span> flate</span> : <code class="type">'a <a href="Zlib.html#TYPEt">t</a> -> <a href="Zlib.html#TYPEflush">flush</a> -> <a href="Zlib.html#TYPEstatus">status</a></code></pre><div class="info ">
+<code class="code">flate buffers flush</code> (de)compresses data from the provided input to the
+                        output buffers.<br>
+<b>Returns</b> <a href="Zlib.html#TYPEELTstatus.Ok"><code class="code"><span class="constructor">Zlib</span>.status.<span class="constructor">Ok</span></code></a> if some progress has been made but more input or
+                        output is expected. <a href="Zlib.html#TYPEELTstatus.Stream_end"><code class="code"><span class="constructor">Zlib</span>.status.<span class="constructor">Stream_end</span></code></a> if all data has been
+                        processed. <a href="Zlib.html#TYPEELTstatus.Need_dict"><code class="code"><span class="constructor">Zlib</span>.status.<span class="constructor">Need_dict</span></code></a> if a dictionary is needed when
+                        inflating zlib data. <a href="Zlib.html#TYPEELTstatus.Data_error"><code class="code"><span class="constructor">Zlib</span>.status.<span class="constructor">Data_error</span></code></a> if the provided data
+                        is inconsistent.<br>
+</div>
+
+<pre><span id="VALinflate_set_dictionary"><span class="keyword">val</span> inflate_set_dictionary</span> : <code class="type"><a href="Zlib.html#TYPEinflate">inflate</a> <a href="Zlib.html#TYPEstate">state</a> -> string -> <a href="Zlib.html#TYPEstatus">status</a></code></pre><div class="info ">
+<code class="code">inflate_set_dictionary state dict</code> Sets a preset dictionary for
+                        decompression. Must be called after <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a> requested a
+                        dictionary by returning <a href="Zlib.html#TYPEELTstatus.Need_dict"><code class="code"><span class="constructor">Zlib</span>.status.<span class="constructor">Need_dict</span></code></a>; the cksum field of
+                        <a href="Zlib.html#TYPEstate"><code class="code"><span class="constructor">Zlib</span>.state</code></a> will then contain the adler32 checksum of the
+                        required dictionary.<br>
+<b>Returns</b> <a href="Zlib.html#TYPEELTstatus.Data_error"><code class="code"><span class="constructor">Zlib</span>.status.<span class="constructor">Data_error</span></code></a> when the adler32 checksum of the provided
+                        dictionary doesn't match the requested checksum.<br>
+</div>
+
+<pre><span id="VALdeflate_set_dictionary"><span class="keyword">val</span> deflate_set_dictionary</span> : <code class="type"><a href="Zlib.html#TYPEdeflate">deflate</a> <a href="Zlib.html#TYPEstate">state</a> -> string -> int32</code></pre><div class="info ">
+<code class="code">deflate_set_dictionary state dict</code> Sets a preset dictionary for
+                        compression. When using the zlib format this needs to
+                        be called before the first call to <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a>.
+                        No dictionary may be used for the gzip format.<br>
+<b>Returns</b> the adler32 checksum of the provided dictionary.<br>
+</div>
+
+<pre><span id="VALget_header"><span class="keyword">val</span> get_header</span> : <code class="type"><a href="Zlib.html#TYPEinflate">inflate</a> <a href="Zlib.html#TYPEstate">state</a> -> <a href="Zlib.html#TYPEheader">header</a></code></pre><div class="info ">
+<code class="code">get_header header</code> Retrieve a header after a gzip header has been read by
+                        <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a>.<br>
+<b>Raises</b><ul><li><code>Failure</code> <code class="code"><span class="string">"Zlib.get_header: Header not yet completed."</span></code>
+                        if the header has not yet been completely read.</li>
+<li><code>Not_found</code> if not reading gzip format.</li>
+</ul>
+<b>Returns</b> the header read by <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a>.<br>
+</div>
+
+<pre><span id="VALset_header"><span class="keyword">val</span> set_header</span> : <code class="type"><a href="Zlib.html#TYPEdeflate">deflate</a> <a href="Zlib.html#TYPEstate">state</a> -> <a href="Zlib.html#TYPEheader">header</a> -> unit</code></pre><div class="info ">
+<code class="code">set_header state header</code> Provide a header when writing the gzip format. Must be
+                        called before any call to <a href="Zlib.html#VALflate"><code class="code"><span class="constructor">Zlib</span>.flate</code></a>.<br>
+</div>
+
+<pre><span id="VALreset"><span class="keyword">val</span> reset</span> : <code class="type">'a <a href="Zlib.html#TYPEt">t</a> -> unit</code></pre><div class="info ">
+<code class="code">reset buffers</code>     Prepares for a new stream of data to be (de)compressed.
+                        The parameters passed to <a href="Zlib.html#VALinflate_init"><code class="code"><span class="constructor">Zlib</span>.inflate_init</code></a> resp.
+                        <a href="Zlib.html#VALdeflate_init"><code class="code"><span class="constructor">Zlib</span>.deflate_init</code></a> are left unchanged.<br>
+</div>
+
+<pre><span id="VALget_data_type"><span class="keyword">val</span> get_data_type</span> : <code class="type"><a href="Zlib.html#TYPEdeflate">deflate</a> <a href="Zlib.html#TYPEt">t</a> -> <a href="Zlib.html#TYPEdata_type">data_type</a></code></pre><div class="info ">
+<code class="code">get_data_type buffers</code> gets the data type of the data being compressed.<br>
+<b>Returns</b> Best guess on the data being compressed.<br>
+</div>
+
+<pre><span id="VALadler32"><span class="keyword">val</span> adler32</span> : <code class="type">int32 -> string -> int32</code></pre><div class="info ">
+<code class="code">adler32 cksum buf</code> Updates the running adler32 checksum<br>
+<b>Returns</b> updated checksum.<br>
+</div>
+
+<pre><span id="VALadler32_empty"><span class="keyword">val</span> adler32_empty</span> : <code class="type">int32</code></pre><div class="info ">
+Initial value to be used with <a href="Zlib.html#VALadler32"><code class="code"><span class="constructor">Zlib</span>.adler32</code></a><br>
+</div>
+</body></html>

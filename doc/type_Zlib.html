@@ -1,0 +1,82 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Zlib" rel="Chapter" href="Zlib.html"><title>Zlib</title>
+</head>
+<body>
+<code class="code"><span class="keyword">sig</span>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;status&nbsp;=&nbsp;<span class="constructor">Ok</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Stream_end</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Need_dict</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Buf_error</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Data_error</span>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;algo&nbsp;=&nbsp;<span class="constructor">Deflated</span>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;strategy&nbsp;=&nbsp;<span class="constructor">Default_strategy</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Filtered</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Huffman_only</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">RLE</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Fixed</span>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;flush&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">No_flush</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Partial_flush</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Sync_flush</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Full_flush</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Finish</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Block</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Trees</span>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;data_type&nbsp;=&nbsp;<span class="constructor">Binary</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Text</span>&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="constructor">Unknown</span>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;deflate
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;inflate
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;state
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;t&nbsp;=&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;state&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Zlib</span>.state;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;in_ba&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(char,&nbsp;<span class="constructor">Bigarray</span>.int8_unsigned_elt,&nbsp;<span class="constructor">Bigarray</span>.c_layout)&nbsp;<span class="constructor">Bigarray</span>.<span class="constructor">Array1</span>.t;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;out_ba&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(char,&nbsp;<span class="constructor">Bigarray</span>.int8_unsigned_elt,&nbsp;<span class="constructor">Bigarray</span>.c_layout)&nbsp;<span class="constructor">Bigarray</span>.<span class="constructor">Array1</span>.t;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;in_ofs&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;out_ofs&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;in_len&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;out_len&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;in_total&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;out_total&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;data_type&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">mutable</span>&nbsp;cksum&nbsp;:&nbsp;int32;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;header&nbsp;=&nbsp;{
+&nbsp;&nbsp;&nbsp;&nbsp;text&nbsp;:&nbsp;bool;
+&nbsp;&nbsp;&nbsp;&nbsp;mtime&nbsp;:&nbsp;int32;
+&nbsp;&nbsp;&nbsp;&nbsp;os&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;xflags&nbsp;:&nbsp;int;
+&nbsp;&nbsp;&nbsp;&nbsp;extra&nbsp;:&nbsp;string&nbsp;option;
+&nbsp;&nbsp;&nbsp;&nbsp;name&nbsp;:&nbsp;string&nbsp;option;
+&nbsp;&nbsp;&nbsp;&nbsp;comment&nbsp;:&nbsp;string&nbsp;option;
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;create_inflate&nbsp;:&nbsp;?window_bits:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.inflate&nbsp;<span class="constructor">Zlib</span>.t
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;create_deflate&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;?level:int&nbsp;<span class="keywordsign">-&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;?algo:<span class="constructor">Zlib</span>.algo&nbsp;<span class="keywordsign">-&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;?window_bits:int&nbsp;<span class="keywordsign">-&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;?memory:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;?strategy:<span class="constructor">Zlib</span>.strategy&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.deflate&nbsp;<span class="constructor">Zlib</span>.t
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;inflate_init&nbsp;:&nbsp;window_bits:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.inflate&nbsp;<span class="constructor">Zlib</span>.state
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="string">"zlib_inflate_init"</span>
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;deflate_init&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;level:int&nbsp;<span class="keywordsign">-&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;algo:<span class="constructor">Zlib</span>.algo&nbsp;<span class="keywordsign">-&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;window_bits:int&nbsp;<span class="keywordsign">-&gt;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;memory:int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;strategy:<span class="constructor">Zlib</span>.strategy&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.deflate&nbsp;<span class="constructor">Zlib</span>.state
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="string">"zlib_deflate_init"</span>
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;deflate_bound&nbsp;:&nbsp;<span class="constructor">Zlib</span>.deflate&nbsp;<span class="constructor">Zlib</span>.state&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="string">"zlib_deflate_bound"</span>
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;flate&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Zlib</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.flush&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.status&nbsp;=&nbsp;<span class="string">"zlib_flate"</span>
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;inflate_set_dictionary&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Zlib</span>.inflate&nbsp;<span class="constructor">Zlib</span>.state&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.status
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="string">"zlib_inflate_set_dictionary"</span>
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;deflate_set_dictionary&nbsp;:
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Zlib</span>.deflate&nbsp;<span class="constructor">Zlib</span>.state&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int32
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="string">"zlib_deflate_set_dictionary"</span>
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;get_header&nbsp;:&nbsp;<span class="constructor">Zlib</span>.inflate&nbsp;<span class="constructor">Zlib</span>.state&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.header
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="string">"zlib_get_header"</span>
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;set_header&nbsp;:&nbsp;<span class="constructor">Zlib</span>.deflate&nbsp;<span class="constructor">Zlib</span>.state&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.header&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit
+&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;<span class="string">"zlib_set_header"</span>
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;reset&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Zlib</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;unit&nbsp;=&nbsp;<span class="string">"zlib_reset"</span>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;get_data_type&nbsp;:&nbsp;<span class="constructor">Zlib</span>.deflate&nbsp;<span class="constructor">Zlib</span>.t&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Zlib</span>.data_type
+&nbsp;&nbsp;<span class="keyword">external</span>&nbsp;adler32&nbsp;:&nbsp;int32&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;string&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;int32&nbsp;=&nbsp;<span class="string">"zlib_adler32"</span>
+&nbsp;&nbsp;<span class="keyword">val</span>&nbsp;adler32_empty&nbsp;:&nbsp;int32
+<span class="keyword">end</span></code></body></html>
