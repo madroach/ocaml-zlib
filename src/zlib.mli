@@ -29,6 +29,9 @@
    @author Christopher Zimmermann
 *)
 
+
+type bigstring = (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
+
 type status =
   | Ok                (** 0 *)
   | Stream_end        (** 1 *)
@@ -77,10 +80,10 @@ type 'a state
 (** Holds the internal state of zlib and the binding library. *)
 type 'a t =
   { state :'a state
-  ; mutable in_ba     :((char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t)
-    (** bigarray input buffer *)
-  ; mutable out_ba    :((char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t)
-    (** bigarray output buffer *)
+  ; mutable in_ba     :bigstring
+    (** bigstring input buffer *)
+  ; mutable out_ba    :bigstring
+    (** bigstring output buffer *)
   ; mutable in_ofs    :int
     (** offset into the input buffer *)
   ; mutable out_ofs   :int

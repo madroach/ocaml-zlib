@@ -17,7 +17,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <errno.h>
 #include <zlib.h>
 
@@ -28,6 +27,7 @@
 #include <caml/fail.h>
 #include <caml/bigarray.h>
 #include <caml/threads.h>
+#include <caml/misc.h>
 
 
 value zlib_adler32(value vadler, value vbuf)
@@ -71,7 +71,7 @@ value zlib_error(z_streamp strm, int error)
       break;
   }
   /* not reached */
-  assert(0);
+  CAMLassert(0);
 }
 
 struct wrap_strm {
@@ -93,7 +93,7 @@ void zlib_finalize(value vwrap)
   else
     ret = deflateEnd(wrap->strm);
 
-  assert(ret == Z_OK || ret == Z_DATA_ERROR);
+  CAMLassert(ret == Z_OK || ret == Z_DATA_ERROR);
   caml_stat_free(wrap->strm);
   caml_stat_free(wrap->header);
 }
@@ -112,7 +112,7 @@ CAMLprim value zlib_deflate_init(
   z_streamp strm;
   size_t memory;
 
-  assert(Is_long(strategy) && Is_long(method) && 0 == Long_val(method));
+  CAMLassert(Is_long(strategy) && Is_long(method) && 0 == Long_val(method));
 
   strm = caml_stat_alloc(sizeof(z_stream));
   memset(strm, 0, sizeof(z_stream));
@@ -197,7 +197,7 @@ CAMLprim value zlib_deflate_bound(value vwrap, value len)
   struct wrap_strm *wrap = Data_custom_val(vwrap);
   int ret;
 
-  assert((wrap->flags & ZLIB_INFLATE) == 0);
+  CAMLassert((wrap->flags & ZLIB_INFLATE) == 0);
 
   ret = deflateBound(wrap->strm, Long_val(len));
 
@@ -244,7 +244,7 @@ CAMLprim value zlib_deflate_set_dictionary(value vstrm, value vdict)
   struct wrap_strm *wrap = Data_custom_val(vstrm);
   z_streamp strm = wrap->strm;
 
-  assert((wrap->flags & ZLIB_INFLATE) == 0);
+  CAMLassert((wrap->flags & ZLIB_INFLATE) == 0);
 
   zlib_error(strm,
       deflateSetDictionary(strm,
@@ -259,7 +259,7 @@ CAMLprim value zlib_inflate_set_dictionary(value vstrm, value vdict)
   struct wrap_strm *wrap = Data_custom_val(vstrm);
   z_streamp strm = wrap->strm;
 
-  assert(wrap->flags & ZLIB_INFLATE);
+  CAMLassert(wrap->flags & ZLIB_INFLATE);
 
   return
     zlib_error(strm,
@@ -276,34 +276,34 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
   Bytef *p;
   size_t len = sizeof(gz_header);
 
-  assert((wrap->flags & ZLIB_INFLATE) == 0);
+  CAMLassert((wrap->flags & ZLIB_INFLATE) == 0);
 
   /* extra */
   if (Is_block(Field(vheader,4))) {
-    assert(Tag_val(Field(vheader,4)) == 0);
+    CAMLassert(Tag_val(Field(vheader,4)) == 0);
     /* zlib does *not* expect this string to be zero-terminated */
     len += caml_string_length(Field(Field(vheader,4),0));
   }
   else
-    assert(Int_val(Field(vheader,4)) == 0);
+    CAMLassert(Int_val(Field(vheader,4)) == 0);
 
   /* name */
   if (Is_block(Field(vheader,5))) {
-    assert(Tag_val(Field(vheader,5)) == 0);
+    CAMLassert(Tag_val(Field(vheader,5)) == 0);
     /* zlib *does* expect this string to be zero-terminated - add one. */
     len += caml_string_length(Field(Field(vheader,5),0)) + 1;
   }
   else
-    assert(Int_val(Field(vheader,5)) == 0);
+    CAMLassert(Int_val(Field(vheader,5)) == 0);
 
   /* comment */
   if (Is_block(Field(vheader,6))) {
-    assert(Tag_val(Field(vheader,6)) == 0);
+    CAMLassert(Tag_val(Field(vheader,6)) == 0);
     /* zlib *does* expect this string to be zero-terminated - add one. */
     len += caml_string_length(Field(Field(vheader,6),0)) + 1;
   }
   else
-    assert(Int_val(Field(vheader,6)) == 0);
+    CAMLassert(Int_val(Field(vheader,6)) == 0);
 
   if (wrap->header != NULL)
     caml_stat_free(wrap->header);
@@ -359,7 +359,7 @@ CAMLprim value zlib_get_header(value vstrm)
   gz_headerp header = wrap->header;
   int len;
 
-  assert(wrap->flags & ZLIB_INFLATE);
+  CAMLassert(wrap->flags & ZLIB_INFLATE);
 
   /* not in gzip or auto mode or zlib header found */
   if (header == NULL || header->done == -1)
@@ -367,7 +367,7 @@ CAMLprim value zlib_get_header(value vstrm)
   /* header not yet completed */
   if (header->done == 0)
     caml_failwith("Zlib.get_header: Header not yet completed.");
-  assert(header->done == 1);
+  CAMLassert(header->done == 1);
 
   if (header->extra != NULL) {
     len = header->extra_len < header->extra_max
@@ -421,8 +421,8 @@ CAMLprim value zlib_flate(value vstrm, value flush)
   struct wrap_strm *wrap = Data_custom_val(Field(vstrm,0));
   z_streamp strm = wrap->strm;
 
-  assert(Is_long(flush));
-  assert(Caml_ba_array_val(Field(vstrm, 1))->num_dims == 1);
+  CAMLassert(Is_long(flush));
+  CAMLassert(Caml_ba_array_val(Field(vstrm, 1))->num_dims == 1);
 
 # define LField(n) Long_val(Field(vstrm,(n)))
 
@@ -446,8 +446,8 @@ CAMLprim value zlib_flate(value vstrm, value flush)
   else
     strm->avail_out = LField(6);
 
-  assert(strm->avail_in == LField(5));
-  assert(strm->avail_out == LField(6));
+  CAMLassert(strm->avail_in == LField(5));
+  CAMLassert(strm->avail_out == LField(6));
 
   strm->next_in   = (Byte *)Caml_ba_data_val(Field(vstrm, 1)) + LField(3);
   strm->next_out  = (Byte *)Caml_ba_data_val(Field(vstrm, 2)) + LField(4);
