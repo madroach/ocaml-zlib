@@ -224,10 +224,6 @@ CAMLprim value zlib_reset(value vstrm)
   else
     ret = deflateReset(strm);
 
-  Field(vstrm, 3) = Val_long(0);
-  Field(vstrm, 4) = Val_long(0);
-  Field(vstrm, 5) = Val_long(-1);
-  Field(vstrm, 6) = Val_long(-1);
   Field(vstrm, 7) = Val_long(strm->total_in);
   Field(vstrm, 8) = Val_long(strm->total_out);
   Field(vstrm, 9) = Val_long(Z_UNKNOWN);
