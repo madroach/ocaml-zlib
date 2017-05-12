@@ -80,9 +80,9 @@ type 'a state
 (** Holds the internal state of zlib and the binding library. *)
 type 'a t =
   { state :'a state
-  ; mutable in_ba     :bigstring
+  ; mutable in_buf     :bigstring
     (** bigstring input buffer *)
-  ; mutable out_ba    :bigstring
+  ; mutable out_buf    :bigstring
     (** bigstring output buffer *)
   ; mutable in_ofs    :int
     (** offset into the input buffer *)

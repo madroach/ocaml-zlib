@@ -25,8 +25,8 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
         assert (inflate_set_dictionary inflate.state dict == Ok);
   end;
   let bound = deflate_bound deflate.state (Array1.dim buf) in
-  deflate.in_ba <- buf;
-  deflate.out_ba <- Array1.create char c_layout (bound + 768);
+  deflate.in_buf <- buf;
+  deflate.out_buf <- Array1.create char c_layout (bound + 768);
   begin match flate deflate Finish with
     | Stream_end -> ()
     | Ok -> failwith "Ok"
@@ -39,8 +39,8 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
     begin match get_data_type deflate with
         Binary -> "binary" |Text -> "text" |Unknown -> "unknown"
     end;
-  inflate.in_ba <- deflate.out_ba;
-  inflate.out_ba <- Array1.create char c_layout (Array1.dim buf);
+  inflate.in_buf <- deflate.out_buf;
+  inflate.out_buf <- Array1.create char c_layout (Array1.dim buf);
   inflate.in_len <- 10;
   inflate.out_len <- 10;
   let rec loop () =
@@ -48,7 +48,7 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
     | Ok -> 
       if inflate.out_len = 0
       then begin
-        inflate.out_len <- Array1.dim inflate.out_ba - inflate.out_ofs;
+        inflate.out_len <- Array1.dim inflate.out_buf - inflate.out_ofs;
         if inflate.out_len > 10 then inflate.out_len <- 10;
       end;
       if inflate.in_len = 0
@@ -75,7 +75,7 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
   loop ();
   Printf.eprintf " Inflated %i bytes to %i bytes.%!"
     inflate.in_total inflate.out_total;
-  assert (deflate.in_ba = inflate.out_ba);
+  assert (deflate.in_buf = inflate.out_buf);
   prerr_newline ();
   begin match header with
     | None -> ()

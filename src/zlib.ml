@@ -51,8 +51,8 @@ type inflate
 type 'a state
 type 'a t =
   { state :'a state
-  ; mutable in_ba     :((char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t)
-  ; mutable out_ba    :((char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t)
+  ; mutable in_buf    :((char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t)
+  ; mutable out_buf   :((char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t)
   ; mutable in_ofs    :int
   ; mutable out_ofs   :int
   ; mutable in_len    :int
@@ -113,11 +113,11 @@ let get_data_type (mlstate :deflate t) =
 
 (* create caml record wrapping zlib state and bigarray buffers *)0
 let create_deflate, create_inflate =
-  let dummy_ba = Bigarray.(Array1.create char c_layout 0) in
+  let dummy_buf = Bigarray.(Array1.create char c_layout 0) in
   let wrap state =
     { state
-    ; in_ba     = dummy_ba
-    ; out_ba    = dummy_ba
+    ; in_buf    = dummy_buf
+    ; out_buf   = dummy_buf
     ; in_ofs    = 0
     ; out_ofs   = 0
     ; in_len    = -1
