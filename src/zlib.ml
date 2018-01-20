@@ -16,11 +16,11 @@
 
 
 type status = 
-  | Ok                (* 0 *)
-  | Stream_end        (* 1 *)
-  | Need_dict         (* 2 *)
-  | Buf_error         (* 3 (zlib -5) *)
-  | Data_error        (* 4 (zlib -3) *)
+  | Ok                   (* 0 *)
+  | Stream_end           (* 1 *)
+  | Need_dict            (* 2 *)
+  | Buf_error            (* 3 (zlib -5) *)
+  | Data_error of string (* 0 (zlib -3) *)
 
 type algo = Deflated
 

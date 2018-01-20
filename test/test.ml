@@ -32,7 +32,7 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
     | Ok -> failwith "Ok"
     | Need_dict -> failwith "Need_dict"
     | Buf_error -> failwith "Buf_error"
-    | Data_error -> failwith "Data_error"
+    | Data_error s -> failwith ("Data_error: " ^ s)
   end;
   Printf.eprintf "Deflated %i bytes to %i bytes. Bound was %i. Kind was %s.%!"
     deflate.in_total deflate.out_total bound
@@ -66,11 +66,11 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
           assert (adler = inflate.cksum);
           match inflate_set_dictionary inflate.state dict with
           | Ok -> loop ()
-          | Data_error -> failwith "dictionary checksum mismatch"
+          | Data_error s -> failwith ("dictionary checksum mismatch: " ^ s)
           | _ -> failwith "inflate_set_dictionary unknown error"
       end
     | Buf_error -> failwith "Buf_error"
-    | Data_error -> failwith "Data_error"
+    | Data_error s -> failwith ("Data_error: " ^ s)
   in
   loop ();
   Printf.eprintf " Inflated %i bytes to %i bytes.%!"

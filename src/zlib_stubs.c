@@ -15,6 +15,7 @@
  */
 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -41,25 +42,35 @@ value zlib_adler32(value vadler, value vbuf)
 
 value zlib_error(z_streamp strm, int error)
 {
+  CAMLparam0();
+  CAMLlocal1(v);
+  char buf[128];
+
   switch (error)
   {
     case Z_OK:		/* 0 */
     case Z_STREAM_END:	/* 1 */
     case Z_NEED_DICT:	/* 2 */
-      return Val_int(error);
+      CAMLreturn(Val_int(error));
     case Z_BUF_ERROR:
-      return Val_int(3);
+      CAMLreturn(Val_int(3));
     case Z_DATA_ERROR:
-      return Val_int(4);
-
+      v = caml_alloc_small(1, 0);
+      Field(v, 0) = Val_unit;
+      Field(v, 0) = caml_copy_string(strm->msg ? strm->msg : "");
+      CAMLreturn(v);
     case Z_VERSION_ERROR:
-      caml_failwith(strm->msg ? strm->msg : "Zlib version error");
+      snprintf(buf, sizeof(buf), "Zlib version error: %s",
+	  strm->msg ? strm->msg : "");
+      caml_failwith(buf);
       break;
     case Z_MEM_ERROR:
       caml_raise_out_of_memory();
       break;
     case Z_STREAM_ERROR:
-      caml_invalid_argument(strm->msg ? strm->msg : "Zlib stream error");
+      snprintf(buf, sizeof(buf), "Zlib stream error: %s",
+	  strm->msg ? strm->msg : "");
+      caml_invalid_argument(buf);
       break;
     case Z_ERRNO:
       /* strerror is not thread-safe,
@@ -67,7 +78,7 @@ value zlib_error(z_streamp strm, int error)
       caml_failwith(strerror(errno));
       break;
     default:
-      caml_failwith("Unknown return code from zlib");
+      caml_failwith("Zlib: Unknown return code");
       break;
   }
   /* not reached */
@@ -107,7 +118,8 @@ CAMLprim value zlib_deflate_init(
     value memLevel,
     value strategy)
 {
-  value vwrap;
+  CAMLparam0(); /* has only immediate arguments */
+  CAMLlocal1(vwrap);
   struct wrap_strm *wrap;
   z_streamp strm;
   size_t memory;
@@ -146,12 +158,13 @@ CAMLprim value zlib_deflate_init(
 	Int_val(memLevel),
 	Int_val(strategy)));
 
-  return vwrap;
+  CAMLreturn(vwrap);
 }
 
 CAMLprim value zlib_inflate_init(value windowBits)
 {
-  value vwrap;
+  CAMLparam0(); /* has only immediate arguments */
+  CAMLlocal1(vwrap);
   struct wrap_strm *wrap;
   z_streamp strm;
   gz_headerp header = NULL;
@@ -189,11 +202,12 @@ CAMLprim value zlib_inflate_init(value windowBits)
   if (header != NULL)
     zlib_error(strm, inflateGetHeader(strm, header));
 
-  return vwrap;
+  CAMLreturn(vwrap);
 }
 
 CAMLprim value zlib_deflate_bound(value vwrap, value len)
 {
+  CAMLparam1(vwrap); /* len is an immediate. */
   struct wrap_strm *wrap = Data_custom_val(vwrap);
   int ret;
 
@@ -204,7 +218,7 @@ CAMLprim value zlib_deflate_bound(value vwrap, value len)
   if (ret < 0)
     caml_failwith("Zlib.deflate_bound");
   else
-    return Val_long(ret);
+    CAMLreturn(Val_long(ret));
 }
 
 CAMLprim value zlib_reset(value vstrm)
@@ -237,6 +251,7 @@ CAMLprim value zlib_reset(value vstrm)
 
 CAMLprim value zlib_deflate_set_dictionary(value vstrm, value vdict)
 {
+  CAMLparam2(vstrm, vdict);
   struct wrap_strm *wrap = Data_custom_val(vstrm);
   z_streamp strm = wrap->strm;
 
@@ -247,25 +262,27 @@ CAMLprim value zlib_deflate_set_dictionary(value vstrm, value vdict)
 	(Bytef *)String_val(vdict),
 	caml_string_length(vdict)));
 
-  return caml_copy_int32(strm->adler);
+  CAMLreturn(caml_copy_int32(strm->adler));
 }
 
 CAMLprim value zlib_inflate_set_dictionary(value vstrm, value vdict)
 {
+  CAMLparam2(vstrm, vdict);
   struct wrap_strm *wrap = Data_custom_val(vstrm);
   z_streamp strm = wrap->strm;
 
   CAMLassert(wrap->flags & ZLIB_INFLATE);
 
-  return
+  CAMLreturn(
     zlib_error(strm,
 	inflateSetDictionary(strm,
 	  (Bytef *)String_val(vdict),
-	  caml_string_length(vdict)));
+	  caml_string_length(vdict))));
 }
 
 CAMLprim value zlib_set_header(value vstrm, value vheader)
 {
+  CAMLparam2(vstrm, vheader);
   struct wrap_strm *wrap = Data_custom_val(vstrm);
   z_streamp strm = wrap->strm;
   gz_headerp header;
@@ -344,7 +361,7 @@ CAMLprim value zlib_set_header(value vstrm, value vheader)
   zlib_error(strm,
       deflateSetHeader(strm, header));
 
-  return Val_unit;
+  CAMLreturn(Val_unit);
 }
 
 CAMLprim value zlib_get_header(value vstrm)

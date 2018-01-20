@@ -33,11 +33,11 @@
 type bigstring = (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 
 type status =
-  | Ok                (** 0 *)
-  | Stream_end        (** 1 *)
-  | Need_dict         (** 2 *)
-  | Buf_error         (** 3 (zlib -5) *)
-  | Data_error        (** 4 (zlib -3) *)
+  | Ok                   (** 0 *)
+  | Stream_end           (** 1 *)
+  | Need_dict            (** 2 *)
+  | Buf_error            (** 3 (zlib -5) *)
+  | Data_error of string (** 0 (zlib -3) *)
 (** Zlib return codes. Only non-fatal return codes are returned. Fatal error
    codes are translated to the standard exceptions [Failure _],
    [Invalid_argument _] or [Out_of_memory]. *)
