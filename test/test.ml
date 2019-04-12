@@ -91,7 +91,7 @@ let deflate_inflate ?dict ?header ?(window_bits=15) buf =
 ;;
 
 let () =
-  let filename = "src/zlib_stubs.c" in
+  let filename = "../src/zlib_stubs.c" in
   let fd = Unix.(openfile filename [O_RDONLY] 0) in
   let dict = "LongstatMEMORYfinalizesystemdataIsruntimearrayreturnValfieldMAXStorememLevelinflatestreamcopysizeofadlervdicttotalfailwithallocvaluevstrmintretflushvaluevwrapZdeflatebawindowBitsbreakCamlmemoryERRORvwrapzlibintCAMLprimvaluezlibifDatacustomflagsINFLATEstreampzstrmstrmcaseZstructwrapZLIBerrorassertIntinret#includeoutzValavailLFieldlongcamlFieldwrapvalvstrmzstrm" in
   let dict = Zlib.adler32 Zlib.adler32_empty dict, dict in
