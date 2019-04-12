@@ -7,10 +7,12 @@ bug-reports: "https://github.com/madroach/ocaml-zlib/issues"
 tags: [ "clib:z" "compression" ]
 license: "ISC"
 build: [
-  ["dune" "build" "-p" "zlib" "-j" 2]
+  ["dune" "build" "-p" "zlib"]
+  ["dune" "build" "@doc" "-p" "zlib"] {with-doc}
 ]
-build-test: [["dune" "runtest" "-p" "zlib"]]
+run-test: [["dune" "runtest" "-p" "zlib"] {ocaml:version >= "4.06"}]
 depends: [
+  "ocaml"
   "dune"
   "base-bigarray"
   "conf-zlib"
