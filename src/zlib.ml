@@ -49,6 +49,8 @@ type deflate
 type inflate
 
 type 'a state
+type bigstring =
+  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 type 'a t =
   { state :'a state
   ; mutable in_buf    :((char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t)

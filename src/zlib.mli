@@ -30,8 +30,6 @@
 *)
 
 
-type bigstring = (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
-
 type status =
   | Ok                   (** 0 *)
   | Stream_end           (** 1 *)
@@ -77,7 +75,10 @@ type inflate
    deflate. *)
 
 type 'a state
-(** Holds the internal state of zlib and the binding library. *)
+(** Internal state *)
+
+type bigstring =
+  (char, Bigarray.int8_unsigned_elt, Bigarray.c_layout) Bigarray.Array1.t
 type 'a t =
   { state :'a state
   ; mutable in_buf     :bigstring
@@ -271,5 +272,6 @@ external adler32 : int32 -> string -> int32 = "zlib_adler32"
     @param cksum        The running adler32 checksum to be updated.
     @param buf          The data with which to update the [cksum].
 *)
+
 val adler32_empty : int32
 (** Initial value to be used with {!adler32} *)
