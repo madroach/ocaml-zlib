@@ -105,7 +105,10 @@ let () =
     ; name    = Some ("This is the filename" ^ String.make 576 '#')
     ; comment = Some "This is the comment"
     } in
-  let text = Array1.map_file fd char c_layout false ~-1 in
+  let text =
+    array1_of_genarray @@
+    Unix.map_file fd char c_layout false [|~-1|]
+  in
   let binary = Array1.create char c_layout 500_000 in
   let ascii = Array1.create char c_layout 500_000 in
   Random.self_init ();
