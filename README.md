@@ -1,4 +1,4 @@
 # ocaml-zlib
 OCaml zlib bindings
 
-[Documentation](https://gmerlin.de/ocaml-zlib/)
+[Documentation](https://www.gmerlin.de/ocaml-zlib/)
