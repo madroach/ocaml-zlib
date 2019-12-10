@@ -97,13 +97,23 @@ struct wrap_strm {
 void zlib_finalize(value vwrap)
 {
   struct wrap_strm *wrap = Data_custom_val(vwrap);
+#ifdef DEBUG
   int ret;
+#endif
 
   if (wrap->flags & ZLIB_INFLATE)
-    ret = inflateEnd(wrap->strm);
+#ifdef DEBUG
+    ret =
+#endif
+      inflateEnd(wrap->strm);
   else
-    ret = deflateEnd(wrap->strm);
+#ifdef DEBUG
+    ret =
+#endif
+      deflateEnd(wrap->strm);
 
+  /* CAMLassert does only access ret when DEBUG is defined.
+   * In case DEBUG is not defined, gcc would warn unused-but-set-variable. */
   CAMLassert(ret == Z_OK || ret == Z_DATA_ERROR);
   caml_stat_free(wrap->strm);
   caml_stat_free(wrap->header);
