@@ -16,6 +16,7 @@ depends: [
   "dune"
   "base-bigarray"
   "conf-zlib"
+  "odoc" {with-doc}
 ]
 synopsis: "Bindings for the zlib compression library"
 description: """

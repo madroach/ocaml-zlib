@@ -1,4 +1,5 @@
-(library (name zlib)
+(library
+ (name zlib)
  (public_name zlib)
  (synopsis "wrapper for the zlib compression library")
  (flags :standard -safe-string)
