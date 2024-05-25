@@ -113,7 +113,7 @@ let get_data_type (mlstate :deflate t) =
   |_ -> assert(false)
 ;;
 
-(* create caml record wrapping zlib state and bigarray buffers *)0
+(* create caml record wrapping zlib state and bigarray buffers *)
 let create_deflate, create_inflate =
   let dummy_buf = Bigarray.(Array1.create char c_layout 0) in
   let wrap state =
