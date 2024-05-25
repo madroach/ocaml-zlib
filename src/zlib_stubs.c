@@ -31,6 +31,9 @@
 #include <caml/threads.h>
 #include <caml/misc.h>
 
+#if !defined(CAML_SAFE_STRING) && !defined(Bytes_val)
+# define Bytes_val(x) String_val(x)
+#endif
 
 value zlib_adler32(value vadler, value vbuf)
 {
@@ -397,7 +400,7 @@ CAMLprim value zlib_get_header(value vstrm)
     len = header->extra_len < header->extra_max
 	? header->extra_len : header->extra_max;
     tmp = caml_alloc_string(len);
-    memcpy(String_val(tmp), header->extra, len);
+    memcpy(Bytes_val(tmp), header->extra, len);
     extra = caml_alloc_small(1, 0);
     Field(extra,0) = tmp;
   }
@@ -407,7 +410,7 @@ CAMLprim value zlib_get_header(value vstrm)
   if (header->name != NULL) {
     len = strnlen((char *)header->name, header->name_max);
     tmp = caml_alloc_string(len);
-    memcpy(String_val(tmp), header->name, len);
+    memcpy(Bytes_val(tmp), header->name, len);
     name = caml_alloc_small(1, 0);
     Field(name,0) = tmp;
   }
@@ -417,7 +420,7 @@ CAMLprim value zlib_get_header(value vstrm)
   if (header->comment != NULL) {
     len = strnlen((char *)header->comment, header->comm_max);
     tmp = caml_alloc_string(len);
-    memcpy(String_val(tmp), header->comment, len);
+    memcpy(Bytes_val(tmp), header->comment, len);
     comment = caml_alloc_small(1, 0);
     Field(comment,0) = tmp;
   }
