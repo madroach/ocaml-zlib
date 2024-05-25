@@ -1,3 +1,3 @@
 (lang dune 1.1)
 (name zlib)
-(version 0.6)
+(version 0.7)
