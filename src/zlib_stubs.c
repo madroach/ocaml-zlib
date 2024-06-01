@@ -460,8 +460,10 @@ CAMLprim value zlib_flate(value vstrm, value flush)
   strm->avail_in  -= LField(3);
   strm->avail_out -= LField(4);
   /* given substring inside bigarray bounds? */
-  if (LField(3) < 0 || LField(4) < 0 ||
-      LField(5) > strm->avail_in || LField(6) > strm->avail_out)
+  if (LField(3) < 0 ||
+      LField(4) < 0 ||
+      LField(5) > (value)strm->avail_in ||
+      LField(6) > (value)strm->avail_out)
     caml_invalid_argument("Zlib.flate");
   /* if given length is negative use default and return it. */
   if (LField(5) < 0)
